@@ -1,0 +1,109 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Name Comparison Tool</title>
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+      background-color: #f4f4f4;
+    }
+ 
+    h2 {
+      color: #333;
+    }
+ 
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+ 
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+ 
+    button:hover {
+      background-color: #004d99;
+    }
+ 
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+</style>
+</head>
+<body>
+ 
+<h2>Check for Minor Name Change</h2>
+ 
+<label for="name1">Original Name:</label>
+<input type="text" id="name1" placeholder="Enter original name">
+ 
+<label for="name2">Changed Name:</label>
+<input type="text" id="name2" placeholder="Enter changed name">
+ 
+<button onclick="checkChange()">Compare</button>
+ 
+<div id="result"></div>
+ 
+<script>
+function isMinorChange(name1, name2) {
+  function levenshtein(a, b) {
+    const dp = Array.from({ length: a.length + 1 }, () =>
+      Array(b.length + 1).fill(0)
+    );
+ 
+    for (let i = 0; i <= a.length; i++) dp[i][0] = i;
+    for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+ 
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        if (a[i - 1] === b[j - 1]) {
+          dp[i][j] = dp[i - 1][j - 1];
+        } else {
+          dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+        }
+      }
+    }
+ 
+    return dp[a.length][b.length];
+  }
+ 
+  const distance = levenshtein(name1.toLowerCase(), name2.toLowerCase());
+  return distance <= 2;
+}
+ 
+function checkChange() {
+  const name1 = document.getElementById("name1").value.trim();
+  const name2 = document.getElementById("name2").value.trim();
+  const resultDiv = document.getElementById("result");
+ 
+  if (!name1 || !name2) {
+    resultDiv.textContent = "Please enter both names.";
+    resultDiv.style.color = "red";
+    return;
+  }
+ 
+  const isMinor = isMinorChange(name1, name2);
+  if (isMinor) {
+    resultDiv.textContent = `✅ Minor change detected between "${name1}" and "${name2}".`;
+    resultDiv.style.color = "green";
+  } else {
+    resultDiv.textContent = `❌ Major change detected between "${name1}" and "${name2}".`;
+    resultDiv.style.color = "red";
+  }
+}
+</script>
+ 
+</body>
+</html>
